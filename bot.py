@@ -1,41 +1,43 @@
 import os
+import requests
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
+UZUM_API = os.getenv("UZUM_API_KEY")
 
 ADMIN_ID = 1487812692
+SHOP_ID = 75362
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_user.id != ADMIN_ID:
-        return
-
     await update.message.reply_text(
-        "✅ Бот работает\n\n"
-        "/products\n"
-        "/orders\n"
-        "/expenses"
+        "✅ Shodlik Bot\n\n"
+        "/products"
     )
 
 
 async def products(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("📦 PRODUCTS OK")
+    try:
+        url = f"https://api-seller.uzum.uz/api/seller-openapi/v1/product/shop/{SHOP_ID}"
 
+        headers = {
+            "Authorization": UZUM_API
+        }
 
-async def orders(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("📋 ORDERS OK")
+        r = requests.get(url, headers=headers)
 
+        await update.message.reply_text(
+            f"Статус: {r.status_code}\n\n{r.text[:3000]}"
+        )
 
-async def expenses(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("💰 EXPENSES OK")
+    except Exception as e:
+        await update.message.reply_text(f"Ошибка:\n{e}")
 
 
 app = Application.builder().token(TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("products", products))
-app.add_handler(CommandHandler("orders", orders))
-app.add_handler(CommandHandler("expenses", expenses))
 
 app.run_polling()
