@@ -19,7 +19,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def products(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        url = f"https://api-seller.uzum.uz/api/seller-openapi/v1/product/shop/{SHOP_ID}"
+        url = f"https://api-seller.uzum.uz/api/seller-openapi/v1/product/shop/{SHOP_ID}?sortBy=DEFAULT&order=ASC&size=20&page=0&filter=ALL"
 
         headers = {
             "Authorization": UZUM_API
