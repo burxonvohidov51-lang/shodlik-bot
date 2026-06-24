@@ -32,11 +32,15 @@ async def products(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         url = f"https://api-seller.uzum.uz/api/seller-openapi/v1/product/shop/{SHOP_ID}"
+r = requests.get(url, headers=headers)
+data = r.json()
 
-        r = requests.get(url, headers=headers)
-        data = r.json()
+await update.message.reply_text(
+    f"Status: {r.status_code}\n\n{str(data)[:3000]}"
+)
+return
 
-        text = "📦 Товары:\n\n"
+text = "📦 Товары:\n\n""
 
         for item in data[:20]:
             text += f"{item.get('title','Без названия')}\n"
