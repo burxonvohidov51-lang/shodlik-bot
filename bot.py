@@ -27,9 +27,15 @@ async def products(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         r = requests.get(url, headers=headers)
 
-        await update.message.reply_text(
-            f"Статус: {r.status_code}\n\n{r.text[:3000]}"
-        )
+        data = r.json()
+
+text = "📦 Товары:\n\n"
+
+for product in data["productList"][:10]:
+    text += f"🛍 {product['title']}\n"
+    text += f"💰 Цена: {product['price']}\n\n"
+
+await update.message.reply_text(text)
 
     except Exception as e:
         await update.message.reply_text(f"Ошибка:\n{e}")
