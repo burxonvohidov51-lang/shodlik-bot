@@ -27,19 +27,34 @@ async def products(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         r = requests.get(url, headers=headers)
 
+        if r.status_code != 200:
+            await update.message.reply_text(
+                f"Ошибка {r.status_code}\n\n{r.text}"
+            )
+            return
+
         data = r.json()
 
-text = "📦 Товары:\n\n"
+        text = "📦 Товары:\n\n"
 
-for product in data["productList"][:10]:
-    text += f"🛍 {product['title']}\n"
-    text += f"💰 Цена: {product['price']}\n\n"
+        for product in data.get("productList", [])[:10]:
+            title = product.get("title", "Без названия")
+            price = product.get("price", "Нет цены")
+            quantity = product.get("quantityAvailable", 0)
 
-await update.message.reply_text(text)
+            text += (
+                f"🛍 {title}\n"
+                f"💰 Цена: {price}\n"
+                f"📦 Остаток: {quantity}\n\n"
+            )
+
+        if text == "📦 Товары:\n\n":
+            text += "Товары не найдены."
+
+        await update.message.reply_text(text)
 
     except Exception as e:
         await update.message.reply_text(f"Ошибка:\n{e}")
-
 
 app = Application.builder().token(TOKEN).build()
 
